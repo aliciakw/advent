@@ -51,8 +51,9 @@ defmodule ElfCalorieCounter do
   end
 
   defp find_greediest_elf(elf_list) do
-    Enum.with_index(elf_list, 1)
+    {calories, index} = Enum.with_index(elf_list, 1)
     |> Enum.reduce(nil, &compare_tuples/2)
+    {calories, List.delete_at(elf_list, index - 1)}
   end
 
   def run do
@@ -60,9 +61,18 @@ defmodule ElfCalorieCounter do
     
     elf_list = parse_input(@input_path)
     greediest_elf = find_greediest_elf(elf_list)
+    {calories_1, elf_list_1} = greediest_elf
+    IO.puts "* The greediest elf has #{calories_1}."
+ 
+    {calories_2, elf_list_2} = find_greediest_elf(elf_list_1)
+    IO.puts "* The second greediest elf has #{calories_2}."
 
-    {calories, index} = greediest_elf
-    IO.puts "--> Elf ##{index} is carrying the most calories (#{calories})."
+
+    {calories_3, _} = find_greediest_elf(elf_list_2)
+    IO.puts "* The third greediest elf has #{calories_3}."
+
+    total = calories_1 + calories_2 + calories_3
+    IO.puts "* In total they have #{total} calories"
   end
 
 end
