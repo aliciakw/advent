@@ -16,25 +16,25 @@ defmodule ElfCalorieCounter do
     Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
   """
 
-  defp parse_input(raw) do
-    String.split(raw, "\n\n") |> Enum.map(fn(x) ->
-      string_arr = String.split(x, "\n")
-      num_arr = string_arr |> Enum.map(fn(y) ->  {num, _} = Integer.parse(y); num end)
-      Enum.sum(num_arr)
-    end)
+  defp parse_elf_cals({raw, index}) do
+    calories = String.split(raw, "\n") 
+      |> Enum.reduce(0, fn(x, sum) -> {num, _} = Integer.parse(x); sum + num end)
+    {calories, index}
   end
 
-  defp compare_tuples(a, b) when is_nil(a), do: b
-  defp compare_tuples(a, b) when is_nil(b), do: a
-  defp compare_tuples(a, b) do
-    {max_a, _} = a
-    {max_b, _} = b
-    if max_b > max_a, do: b, else: a
+  defp compare_tuples(entry, max) when is_nil(entry), do: max
+  defp compare_tuples(entry, max) when is_nil(max) do
+    parse_elf_cals(entry)
+  end
+  defp compare_tuples(entry, max) do
+    {max_cals, _} = max
+    parsed_entry = parse_elf_cals(entry)
+    {entry_cals, _} = parsed_entry
+    if entry_cals > max_cals, do: parsed_entry, else: max
   end
 
-
-  defp find_max(arr) do
-    Enum.with_index(arr, 1)
+  defp find_greediest_elf(elf_list) do
+    Enum.with_index(elf_list, 1)
     |> Enum.reduce(nil, &compare_tuples/2)
   end
 
@@ -42,12 +42,13 @@ defmodule ElfCalorieCounter do
     IO.puts "Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?"
     
     input = File.read!(__DIR__ <> @input_path)
+    elf_list = String.split(input, "\n\n")
+    IO.puts "PARSED"
+    
+    greediest_elf = find_greediest_elf(elf_list)
+    IO.inspect(greediest_elf)
 
-    elf_calories = parse_input(input)
-   
-    IO.inspect(elf_calories)
-
-    {calories, index} = find_max(elf_calories)
+    {calories, index} = greediest_elf
     IO.puts "Elf ##{index} is carrying the most calories (#{calories})."
   end
 
