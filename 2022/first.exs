@@ -1,5 +1,5 @@
-demo_input_path = "./input/first_demo.txt"
-input_path = "./input/first.txt"
+demo_input_path = "/input/first_demo.txt"
+input_path = "/input/first.txt"
 
 defmodule ElfCalorieCounter do
   @input_path demo_input_path
@@ -40,8 +40,8 @@ defmodule ElfCalorieCounter do
 
   def run do
     IO.puts "Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?"
-
-    {:ok, input} = File.read(@input_path)
+    
+    input = File.read!(__DIR__ <> @input_path)
 
     elf_calories = parse_input(input)
    
