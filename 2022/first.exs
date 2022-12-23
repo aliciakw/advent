@@ -2,7 +2,6 @@ demo_input_path = "/input/first_demo.txt"
 input_path = "/input/first.txt"
 
 defmodule ElfCalorieCounter do
-  @input_path demo_input_path
   @moduledoc """
     This list represents the Calories of the food carried by five Elves:
 
@@ -15,10 +14,23 @@ defmodule ElfCalorieCounter do
 
     Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
   """
+  @input_path input_path
+
+  defp add_string_int(nil, total), do: total
+  defp add_string_int("", total), do: total
+  defp add_string_int(string_int, total) do
+    case String.trim(string_int) |> Integer.parse do
+      {int, _} ->
+        total + int
+      :error ->
+         IO.puts("[add_string_int] Bad input: #{string_int}")
+         total
+    end
+  end
 
   defp parse_elf_cals({raw, index}) do
     calories = String.split(raw, "\n") 
-      |> Enum.reduce(0, fn(x, sum) -> {num, _} = Integer.parse(x); sum + num end)
+      |> Enum.reduce(0, &add_string_int/2)
     {calories, index}
   end
 
@@ -33,6 +45,11 @@ defmodule ElfCalorieCounter do
     if entry_cals > max_cals, do: parsed_entry, else: max
   end
 
+  defp parse_input(input_path) do
+    File.read!(__DIR__ <> input_path)
+    |> String.split("\n\n")
+  end
+
   defp find_greediest_elf(elf_list) do
     Enum.with_index(elf_list, 1)
     |> Enum.reduce(nil, &compare_tuples/2)
@@ -41,15 +58,11 @@ defmodule ElfCalorieCounter do
   def run do
     IO.puts "Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?"
     
-    input = File.read!(__DIR__ <> @input_path)
-    elf_list = String.split(input, "\n\n")
-    IO.puts "PARSED"
-    
+    elf_list = parse_input(@input_path)
     greediest_elf = find_greediest_elf(elf_list)
-    IO.inspect(greediest_elf)
 
     {calories, index} = greediest_elf
-    IO.puts "Elf ##{index} is carrying the most calories (#{calories})."
+    IO.puts "--> Elf ##{index} is carrying the most calories (#{calories})."
   end
 
 end
